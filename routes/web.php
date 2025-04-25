@@ -17,7 +17,7 @@ Auth::routes();
 
 // Home
 Route::middleware(['auth'])->group(function () {
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/home', [ProdukController::class, 'index'])->name('home');
     Route::get('/admin/Home', [HomeController::class, 'adminHome'])->name('adminHome');
 });
 
@@ -55,6 +55,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/transaksi/konfirmasi/{id}', [PembelianController::class, 'konfirmasiStatus'])->name('transaksi.konfirmasi');
    Route::get('/transaksi/cetak/{id}', [PembelianController::class, 'generatePdf'])->name('transaksi.cetak');
 
-    //Kategori
+    //Kategori&Search
     Route::resource('kategori', KategoriController::class);
+    Route::resource('produk', ProdukController::class)->except(['show']);
+
+    Route::get('/search', [ProdukController::class, 'search'])->name('produk.search');
 });

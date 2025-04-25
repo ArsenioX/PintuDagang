@@ -9,10 +9,17 @@ use Illuminate\Support\Facades\Storage;
 
 class ProdukController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $produks = Produk::all();
-        return view('adminHome', ['produks' => $produks]);
+        $kategoris = Kategori::all();
+
+        $produks = Produk::with('kategori')
+            ->filter($request->only('q', 'kategori'))
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->appends($request->only('q', 'kategori'));
+
+        return view('home', compact('produks', 'kategoris'));
     }
 
     public function create()
@@ -98,11 +105,42 @@ class ProdukController extends Controller
     }
 
     public function bayar($id)
-{
-    $produk = Produk::findOrFail($id);
-    $produk->sudah_dibayar = true; // Menandai bahwa produk sudah dibayar
-    $produk->save();
+    {
+        $produk = Produk::findOrFail($id);
+        $produk->sudah_dibayar = true; // Menandai bahwa produk sudah dibayar
+        $produk->save();
 
-    return redirect()->back()->with('success', 'Pembayaran berhasil!');
-}
+        return redirect()->back()->with('success', 'Pembayaran berhasil!');
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('q');
+        $kategori = $request->input('kategori');
+
+        // dd($kategori, $query);
+
+        $produk = Produk::query();
+
+        if ($query) {
+            $produk->where('nama', 'like', '%' . $query . '%'); // Sesuaikan field nama
+        }
+
+        if ($kategori) {
+            $produk->where('kategori_id', $kategori); // Sesuaikan dengan field kategori_id
+        }
+
+        $produk = $produk->get();
+
+        // dd($produk);
+
+        $kategoris = Kategori::all(); // Ambil semua kategori untuk dropdown
+        return view('produk.show', compact('produk', 'kategoris', 'query', 'kategori'));
+    }
+
+    public function show($id)
+    {
+        $produk = Produk::findOrFail($id); // Ambil produk berdasarkan ID
+        return view('produk.show', compact('produk')); // Tampilkan view detail produk
+    }
 }

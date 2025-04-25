@@ -69,7 +69,7 @@
 <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
     <div class="col-md-5">
         <div class="card login-card">
-            <div class="login-header">Login Tokopediaku</div>
+            <div class="login-header">Login PintuDagang</div>
 
             <div class="card-body">
                 <form method="POST" action="{{ route('login') }}">

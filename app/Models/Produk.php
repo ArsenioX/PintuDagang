@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Produk extends Model
 {
+    protected $fillable = ['kode_produk', 'kategori_id','foto', 'nama', 'harga',];
     public function produk()
     {
         return $this->belongsTo('Produk::class');
@@ -17,6 +18,17 @@ class Produk extends Model
         return $this->belongsTo(Kategori::class);
     }
 
-    // use HasFactory;
-    protected $fillable = ['kode_produk', 'kategori_id','foto', 'nama', 'harga',];
+    /**
+     * Scope a query to apply search & category filters.
+     */
+    public function scopeFilter($query, array $filters)
+    {
+        if (!empty($filters['q'])) {
+            $query->where('nama', 'like', '%' . $filters['q'] . '%');
+        }
+        if (!empty($filters['kategori'])) {
+            $query->where('kategori_id', $filters['kategori']);
+        }
+        return $query;
+    }
 }
